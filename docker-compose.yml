@@ -1,0 +1,42 @@
+version: '3'
+
+services:
+  drf-web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    restart: always
+    volumes:
+      - .:/app
+    depends_on:
+      - pgsql-db
+      - redis-cache
+    environment:
+      DATABASE_NAME: drf_project
+      DATABASE_USER: user
+      DATABASE_PASSWORD: password
+      DATABASE_HOST: pgsql-db
+      DATABASE_PORT: 5432
+      REDIS_HOST: 127.0.0.1
+      REDIS_PORT: 6379
+
+  pgsql-db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: drf_project
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  redis-cache:
+    image: redis:6
+    ports:
+      - "6379:6379"
+
+volumes:
+  db_data:
